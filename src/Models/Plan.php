@@ -24,8 +24,8 @@ class Plan extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'name', 'description', 'type', 'gateway_name',
-        'amount', 'features', 'settings', 'gateway_data'
+        'name', 'description', 'type',
+        'amount', 'features', 'settings',
     ];
 
     /**
@@ -36,7 +36,6 @@ class Plan extends Model
     protected $casts = [
         'features' => 'json',
         'settings' => 'json',
-        'gateway_data' => 'json'
     ];
 
     /**
@@ -57,10 +56,5 @@ class Plan extends Model
         static::saving(function ($model) {
             $model->slug_name = Str::slug($model->name);
         });
-    }
-
-    public function getGatewayId()
-    {
-        return data_get($this->gateway_data, 'data.plan_id');
     }
 }

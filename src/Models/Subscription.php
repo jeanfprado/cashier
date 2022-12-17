@@ -4,10 +4,9 @@ namespace Jeanfprado\Cashier\Models;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
-use Jeanfprado\Cashier\Support\Facade\Cashier;
-use Jeanfprado\Cashier\Support\Facade\Gateway;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Jeanfprado\Cashier\Support\Facade\Cashier;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Jeanfprado\Cashier\Events\{SubscriptionCreated, SubscriptionCanceled};
 
 class Subscription extends Model
@@ -21,16 +20,7 @@ class Subscription extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'name', 'plan_id', 'gateway_name', 'gateway_data'
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'gateway_data' => 'json'
+        'name', 'plan_id'
     ];
 
     /**
@@ -82,37 +72,15 @@ class Subscription extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | Mutators
-    |--------------------------------------------------------------------------
-    */
-
-    public function getGatewayAttribute()
-    {
-        $name = $this->attributes['gateway_name'];
-
-        if (is_null($name)) {
-            return null;
-        }
-
-        return Gateway::driver($name);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Business Logic
     |--------------------------------------------------------------------------
     */
 
-    public function pay($paymentMethod = 'banking_billet', $paymentToken = '')
+    public function pay($paymentMethod = 'banking_billet')
     {
         $this->payment_method = $paymentMethod;
         $this->save();
 
-        return Cashier::paySubscription($this, $paymentToken);
-    }
-
-    public function getGatewayId()
-    {
-        return data_get($this->gateway_data, 'data.subscription_id');
+        return Cashier::paySubscription($this);
     }
 }

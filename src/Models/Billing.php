@@ -15,6 +15,6 @@ class Billing extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'amount', 'gateway_name', 'gateway_data'
+        'amount'
     ];
 }

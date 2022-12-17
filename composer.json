@@ -14,8 +14,7 @@
         }
     ],
     "require": {
-        "php" : "^7.3|^8.0|^8.1",
-        "gerencianet/gerencianet-sdk-php": "^4.1"
+        "php" : "^7.3|^8.0|^8.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

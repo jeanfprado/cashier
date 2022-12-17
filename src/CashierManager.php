@@ -4,26 +4,19 @@ namespace Jeanfprado\Cashier;
 
 use Jeanfprado\Cashier\Models\Plan;
 use Jeanfprado\Cashier\Models\Subscription;
-use Jeanfprado\Cashier\Support\Facade\Gateway;
 use Jeanfprado\Cashier\Contracts\Subscribable as SubscribableContract;
 
 class CashierManager
 {
     public function subscribe(SubscribableContract $subscribable, Plan $plan)
     {
-        $response = Gateway::subscribe($subscribable, $plan);
-
         return $subscribable->subscription()->create([
             'plan_id' => $plan->id,
-            'gateway_name' => Gateway::getName(),
-            'gateway_data' => $response,
         ]);
     }
 
     public function unsubscribe(SubscribableContract $subscribable)
     {
-        Gateway::unsubscribe($subscribable->subscription);
-
         return $subscribable->cancelSubscription();
     }
 
@@ -40,25 +33,16 @@ class CashierManager
             $data['settings'] = $data['settings'] ?? null;
             $data['options'] = $data['options'] ?? null;
 
-            $response = Gateway::createPlan($data);
-
-            $plansSeed[] = Plan::create(array_merge($data, [
-                'gateway_name' => Gateway::getName(),
-                'gateway_data' => $response,
-            ]));
+            $plansSeed[] = Plan::create($data);
         }
 
         return $plansSeed;
     }
 
-    public function paySubscription(Subscription $subscription, $paymentToken = '')
+    public function paySubscription(Subscription $subscription)
     {
-        $response =  $subscription->gateway->paySubscription($subscription, $paymentToken);
-
         return $subscription->billings()->create([
-            'amount' => $subscription->plan->amount,
-            'gateway_name' => Gateway::getName(),
-            'gateway_data' => $response,
+            'amount' => $subscription->plan->amount
         ]);
     }
 }

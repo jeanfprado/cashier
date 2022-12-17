@@ -16,8 +16,6 @@ return new class () extends Migration {
             $table->id();
             $table->unsignedBigInteger('subscription_id');
             $table->enum('status', ['created', 'pending', 'paid', 'failed']);
-            $table->string('gateway_name');
-            $table->json('gateway_data')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->string('failure_reason')->nullable();
             $table->uuid('public_id')->unique();
