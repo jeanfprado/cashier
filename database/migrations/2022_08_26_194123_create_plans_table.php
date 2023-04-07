@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+class CreatePlansTable extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -17,10 +18,12 @@ return new class () extends Migration {
             $table->string('name');
             $table->string('slug_name');
             $table->string('description')->nullable();
+            $table->enum('type', ['monthly', 'triennial', 'semestrial', 'yearly']);
+            $table->decimal('amount');
             $table->json('features');
             $table->json('options')->nullable();
-            $table->boolean('archived')->default(false);
             $table->json('settings')->nullable();
+            $table->boolean('archived')->default(false);
             $table->uuid('public_id')->unique();
             $table->timestamps();
         });

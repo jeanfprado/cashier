@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+class CreateBillingsTable extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -15,8 +16,10 @@ return new class () extends Migration {
         Schema::create('billings', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('subscription_id');
-            $table->enum('status', ['created', 'pending', 'paid', 'failed']);
-            $table->timestamp('paid_at')->nullable();
+            $table->enum('status', ['created', 'paid', 'failed']);
+            $table->decimal('amount');
+            $table->dateTime('expires_at');
+            $table->dateTime('paid_at')->nullable();
             $table->string('failure_reason')->nullable();
             $table->uuid('public_id')->unique();
             $table->timestamps();
