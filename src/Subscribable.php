@@ -3,8 +3,8 @@
 namespace Jeanfprado\Cashier;
 
 use RuntimeException;
-use Jeanfprado\Cashier\Models\Subscription;
 use Jeanfprado\Cashier\Support\Facade\Cashier;
+use Jeanfprado\Cashier\Models\{Plan, Subscription};
 
 trait Subscribable
 {
@@ -24,24 +24,21 @@ trait Subscribable
 
     /*
     |--------------------------------------------------------------------------
-    | Business Logic
+    | Contract
     |--------------------------------------------------------------------------
     */
 
+
     /**
-     * Return if model is subscribed
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    public function subscribed()
+    public function subscribed(): bool
     {
         return $this->subscription()->exists();
     }
 
     /**
-     * Cancel model's subscription deleted the instance of database
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function cancelSubscription()
     {
@@ -50,7 +47,10 @@ trait Subscribable
         return $this->subscription->delete();
     }
 
-    public function subscribe($plan)
+    /**
+     * {@inheritDoc}
+     */
+    public function subscribe(Plan $plan): Subscription
     {
         return Cashier::subscribe($this, $plan);
     }
