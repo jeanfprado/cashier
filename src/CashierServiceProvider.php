@@ -3,7 +3,8 @@
 namespace Jeanfprado\Cashier;
 
 use Illuminate\Support\ServiceProvider;
-use Jeanfprado\Console\CashierSeedPlans;
+use Jeanfprado\Cashier\Console\CashierSeedPlans;
+use Jeanfprado\Cashier\Console\CashierSubscriptionCheck;
 
 class CashierServiceProvider extends ServiceProvider
 {
@@ -15,7 +16,6 @@ class CashierServiceProvider extends ServiceProvider
     public function register()
     {
         $this->configure();
-        $this->registerClients();
     }
 
     /**
@@ -26,7 +26,8 @@ class CashierServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerMigrations();
-        // $this->registerCommands();
+        $this->registerCommands();
+        $this->registerPublishing();
     }
 
      /**
@@ -52,6 +53,7 @@ class CashierServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CashierSeedPlans::class,
+                CashierSubscriptionCheck::class,
             ]);
         }
     }
@@ -75,14 +77,12 @@ class CashierServiceProvider extends ServiceProvider
      */
     protected function registerPublishing()
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../config/cashier.php' => $this->app->configPath('cashier.php'),
-            ], 'cashier-config');
+        $this->publishes([
+            __DIR__.'/../config/cashier.php' => $this->app->configPath('cashier.php'),
+        ], 'cashier-config');
 
-            $this->publishes([
-                __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
-            ], 'cashier-migrations');
-        }
+        $this->publishes([
+            __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
+        ], 'cashier-migrations');
     }
 }
