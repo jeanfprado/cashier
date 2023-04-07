@@ -6,7 +6,7 @@ return [
 
     'cashier_currency' => env('CASHIER_CURRENCY', 'BRL'),
 
-    'trial_days' => env('CASHIER_TRIAL_DAYS', 1),
+    'trial_days' => env('CASHIER_TRIAL_DAYS', 7),
 
     'model' => \App\Models\User::class,
 

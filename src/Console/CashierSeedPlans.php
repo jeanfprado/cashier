@@ -1,9 +1,9 @@
 <?php
 
-namespace Jeanfprado\Console;
+namespace Jeanfprado\Cashier\Console;
 
 use Illuminate\Console\Command;
-use Jeanfprado\Cashier\Models\Plan;
+use Jeanfprado\Cashier\Support\Facade\Cashier;
 
 class CashierSeedPlans extends Command
 {
@@ -19,7 +19,7 @@ class CashierSeedPlans extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Create all plan from configuration';
 
     /**
      * Execute the console command.
@@ -28,24 +28,10 @@ class CashierSeedPlans extends Command
      */
     public function handle()
     {
-        $plans = config('cashier.plans');
+        $this->info('Starting Create Plans');
+        $plans = Cashier::createPlans();
 
-        $this->seedPlans($plans);
-    }
-
-    protected function seedPlans($plans)
-    {
-        $plansSeed = [];
-        foreach ($plans as $data) {
-            $data['settings'] = $data['settings'] ?? null;
-            $data['options'] = $data['options'] ?? null;
-
-            $plansSeed[] = Plan::firstOrCreate(
-                ['name'=> $data['name']],
-                $data
-            );
-        }
-
-        return $plansSeed;
+        $this->line('<comment>Total plans created:</comment> '. count($plans));
+        $this->info('Finished Create Plans');
     }
 }

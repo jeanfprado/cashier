@@ -1,6 +1,16 @@
 {
     "name": "jeanfprado/cashier",
+    "description": "    Cashier provides a subscription billing services.",
+    "keywords": [
+        "cashier",
+        "laravel",
+        "subscriptions",
+        "recurring",
+        "billing",
+        "plans"
+    ],
     "type": "library",
+    "homepage": "https://github.com/jeanfprado/cashier",
     "license": "MIT",
     "autoload": {
         "psr-4": {
@@ -10,11 +20,13 @@
     "authors": [
         {
             "name": "Jean Prado",
-            "email": "jeanfprado@gmail.com"
+            "email": "jeanfprado@gmail.com",
+            "role": "Owner"
         }
     ],
     "require": {
-        "php" : "^7.3|^8.0|^8.1"
+        "php": "^7.3|^8.0|^8.1",
+        "illuminate/database": "^10.4"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

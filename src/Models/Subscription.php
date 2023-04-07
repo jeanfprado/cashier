@@ -2,17 +2,18 @@
 
 namespace Jeanfprado\Cashier\Models;
 
-use Illuminate\Support\Str;
+use RuntimeException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Jeanfprado\Cashier\Support\Facade\Cashier;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Jeanfprado\Cashier\Concerns\HasPublicIdAttribute;
 use Jeanfprado\Cashier\Events\{SubscriptionCreated, SubscriptionCanceled};
 
 class Subscription extends Model
 {
-    use HasFactory;
     use SoftDeletes;
+    use HasPublicIdAttribute;
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +21,16 @@ class Subscription extends Model
      * @var array<string>
      */
     protected $fillable = [
-        'name', 'plan_id'
+        'plan_id', 'next_billing_at',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'next_billing_at' => 'datetime'
     ];
 
     /**
@@ -32,21 +42,6 @@ class Subscription extends Model
         'created' => SubscriptionCreated::class,
         'deleted' => SubscriptionCanceled::class,
     ];
-
-    /**
-     * Boot the has Sluggable trait for a model.
-     *
-     * @return void
-     */
-    public static function boot()
-    {
-        parent::boot();
-
-        // create a new uuid and inject into the creating user
-        static::creating(function ($model) {
-            $model->public_id = Str::uuid();
-        });
-    }
 
     /*
     |--------------------------------------------------------------------------
@@ -70,17 +65,84 @@ class Subscription extends Model
         return $this->hasMany(Billing::class);
     }
 
+     /**
+     * Get the plan for the subscription.
+     */
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Business Logic
     |--------------------------------------------------------------------------
     */
 
-    public function pay($paymentMethod = 'banking_billet')
+    /**
+     * Generate new billing to pay.
+     *
+     * @param string $paymentMethod
+     * @return void
+     */
+    public function generateBilling()
     {
-        $this->payment_method = $paymentMethod;
-        $this->save();
+        throw_unless($this->canGenerateBilling(), RuntimeException::class, 'Billing does not be created');
 
-        return Cashier::paySubscription($this);
+        return DB::transaction(function () {
+            $billing = Cashier::generateBillingFor($this);
+
+            $this->next_billing_at = $this->getNextBilling();
+            $this->save();
+
+            return $billing;
+        });
+    }
+
+    /**
+     * Return if can generate a new billing.
+     *
+     * @return bool
+     */
+    public function canGenerateBilling()
+    {
+        return $this->next_billing_at->lte(now());
+    }
+
+    /**
+     * Return if the next billing for the subscription.
+     *
+     * @return Carbon
+     */
+    protected function getNextBilling()
+    {
+        return $this->plan->calculateNextBillingFor($this->next_billing_at);
+    }
+
+    /**
+     * Return if this subscription has billing pending.
+     *
+     * @return bool
+     */
+    public function hasBillingPending()
+    {
+        return $this->billings()->pending()->exists();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Query String
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Scope a query to only include subscription of a given next billing.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeNextBilling($query)
+    {
+        return $query->whereDate('next_billing_at', '<=', now()->toDateString());
     }
 }
