@@ -27,5 +27,5 @@ interface Subscribable
      * @param Plan $plan
      * @return Subscription
      */
-    public function subscribe(Plan $plan): Subscription;
+    public function subscribe(Plan $plan, $trialDays = null): Subscription;
 }

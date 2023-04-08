@@ -15,13 +15,13 @@ class CashierManager
      * @param Plan $plan
      * @return void
      */
-    public function subscribe(SubscribableContract $subscribable, Plan $plan)
+    public function subscribe(SubscribableContract $subscribable, Plan $plan, $trialDays = null)
     {
         throw_if($subscribable->subscribed(), RuntimeException::class, 'Subscription already exists.');
 
         return $subscribable->subscription()->create([
             'plan_id' => $plan->id,
-            'next_billing_at' => now()->addDays(config('cashier.trial_days')),
+            'next_billing_at' => now()->addDays($trialDays ?: config('cashier.trial_days')),
         ]);
     }
 
