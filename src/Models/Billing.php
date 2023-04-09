@@ -29,6 +29,16 @@ class Billing extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'paid_at' => 'datetime',
+        'expires_at' => 'datetime',
+    ];
+
+    /**
      * The event map for the model.
      *
      * @var array
