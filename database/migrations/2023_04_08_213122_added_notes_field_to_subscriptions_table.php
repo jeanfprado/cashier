@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddedNotesFieldToSubscriptionTable extends Migration
+class AddedNotesFieldToSubscriptionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddedNotesFieldToSubscriptionTable extends Migration
      */
     public function up()
     {
-        Schema::table('subscription', function (Blueprint $table) {
-            $table->string('notes')->nullable();
+        Schema::table('subscriptions', function (Blueprint $table) {
+            $table->string('notes')->nullable()->after('next_billing_at');
         });
     }
 
@@ -25,7 +25,7 @@ class AddedNotesFieldToSubscriptionTable extends Migration
      */
     public function down()
     {
-        Schema::table('subscription', function (Blueprint $table) {
+        Schema::table('subscriptions', function (Blueprint $table) {
             $table->dropColumn('notes');
         });
     }
