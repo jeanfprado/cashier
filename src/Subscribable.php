@@ -50,8 +50,8 @@ trait Subscribable
     /**
      * {@inheritDoc}
      */
-    public function subscribe(Plan $plan): Subscription
+    public function subscribe(Plan $plan, $trialDays = null): Subscription
     {
-        return Cashier::subscribe($this, $plan);
+        return Cashier::subscribe($this, $plan, $trialDays);
     }
 }
